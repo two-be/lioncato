@@ -1,0 +1,102 @@
+﻿@page "/"
+
+@using Data
+@using Microsoft.EntityFrameworkCore
+
+@inherits AbstractComponentBase
+
+@inject DialogService Dialog
+
+<PageTitle>Lioncato</PageTitle>
+
+<div class="@AppClass.FadeIn container">
+    <RadzenCard>
+        <h2>Lioncato</h2>
+        <LocationForm Location="Location" Save="SaveAsync"></LocationForm>
+        <RadzenDataGrid TItem="LocationInfo" AllowColumnResize="true" AllowPaging="true" AllowSorting="true" Class="rz-selectable" Data="@Locations" PageSize="10" PagerHorizontalAlign="HorizontalAlign.Center" ShowPagingSummary="true">
+            <Columns>
+                <RadzenDataGridColumn TItem="LocationInfo" Property="Name" Title="Name" />
+                <RadzenDataGridColumn TItem="LocationInfo" Sortable="false" TextAlign="TextAlign.Center" Width="60px">
+                    <Template Context="data">
+                        <RadzenImage Path="https://image.twodo.app/icons/apple-maps.png" style="width: 40px; height: 40px; border-radius: 8px;" />
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="LocationInfo" Sortable="false" TextAlign="TextAlign.Center" Width="60px">
+                    <Template Context="data">
+                        <RadzenImage Path="https://image.twodo.app/icons/google-maps.png" style="width: 40px; height: 40px; border-radius: 8px;" />
+                    </Template>
+                </RadzenDataGridColumn>
+            </Columns>
+        </RadzenDataGrid>
+    </RadzenCard>
+</div>
+
+@code {
+
+    protected List<LocationInfo> AllLocations = new List<LocationInfo>();
+    protected LocationInfo Location = new LocationInfo(string.Empty);
+    protected List<LocationInfo> Locations = new List<LocationInfo>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await InitLocationsAsync();
+    }
+
+    protected async Task InitLocationsAsync()
+    {
+        Service.SetLoading(true);
+        using var context = await DbFactory.CreateDbContextAsync();
+        Locations = await context.Locations.ToListAsync();
+        if (!Service.IsSignedIn)
+        {
+            Locations = Locations.Where(x => x.IsPublic).ToList();
+        }
+        AllLocations = Locations;
+        Service.SetLoading(false);
+    }
+
+    protected async Task SaveAsync(LocationInfo value)
+    {
+        try
+        {
+            Service.SetLoading(true);
+            using var context = await DbFactory.CreateDbContextAsync();
+            var id = value.Id;
+            var location = new LocationInfo();
+            if (string.IsNullOrEmpty(id))
+            {
+                await context.Locations.AddAsync(location);
+            }
+            else
+            {
+                location = await context.Locations.FirstOrDefaultAsync(x => x.Id == id);
+                if (location is null)
+                {
+                    await AlertAsync("That location doesn't exist.");
+                    Service.SetLoading(false);
+                    return;
+                }
+            }
+            location.AppleMapsUrl = value.AppleMapsUrl;
+            location.GoogleMapsUrl = value.GoogleMapsUrl;
+            location.IsPublic = value.IsPublic;
+            location.Name = value.Name;
+            await context.SaveChangesAsync();
+
+            AllLocations = AllLocations.Where(x => x.Id != id).ToList();
+            AllLocations.Insert(0, location);
+            Location = new LocationInfo(string.Empty);
+            SimpleSearch();
+            Service.SetLoading(false);
+        }
+        catch (Exception ex)
+        {
+            await ErrorAsync(ex);
+        }
+    }
+
+    protected void SimpleSearch()
+    {
+        Locations = AllLocations.Where(x => true).ToList();
+    }
+}

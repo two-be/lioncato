@@ -1,0 +1,41 @@
+@page "/user"
+
+@using Data
+@using Microsoft.EntityFrameworkCore
+
+@inherits AbstractComponentBase
+
+@inject IDbContextFactory<AppDbContext> DbFactory
+
+<RadzenButton Text="Add"></RadzenButton>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Username</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var data in users)
+        {
+            <tr>
+                <td>@data.Username</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    private List<UserInfo> users = new List<UserInfo>();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await LocalStorage.SetAsync("user", new UserInfo { Username = "Two" });
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = await DbFactory.CreateDbContextAsync();
+        users = await context.Users.ToListAsync();
+    }
+}

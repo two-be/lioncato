@@ -1,0 +1,66 @@
+﻿@using Data
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@using Microsoft.EntityFrameworkCore
+
+@inherits LayoutComponentBase
+
+@inject IDbContextFactory<AppDbContext> DbFactory
+@inject IJSRuntime Js
+@inject ProtectedLocalStorage LocalStorage
+@inject NavigationManager NavigationManager
+@inject AppService Service
+
+<PageTitle>Lioncato</PageTitle>
+
+@if (Service.IsLoading)
+{
+    <Loading></Loading>
+}
+
+<RadzenMenu class="@AppClass.FadeIn">
+    <li class="logo">
+        <div class="rz-navigation-item-wrapper">
+            <a href="/" class="rz-navigation-item-link">
+                <img class="rzi rz-navigation-item-icon" src="https://image.twodo.app/icons/1946770.png">
+                <span class="rz-navigation-item-text">Lioncato</span>
+            </a>
+        </div>
+    </li>
+    @if (Service.IsSignedIn)
+    {
+        <RadzenMenuItem class="animate__animated animate__fadeIn" Icon="home" Path="fetchData" Text="FetchData"></RadzenMenuItem>
+        <RadzenMenuItem class="animate__animated animate__fadeIn" Icon="home" Path="user" Text="User"></RadzenMenuItem>
+        <RadzenMenuItem class="animate__animated animate__fadeIn user-menu-item" Icon="person" Text="@Service.User.Username">
+            <RadzenMenuItem Click="@SignOut" Icon="logout" Text="Sign out"></RadzenMenuItem>
+        </RadzenMenuItem>
+    }
+    else
+    {
+        <RadzenMenuItem class="animate__animated animate__fadeIn user-menu-item" Icon="login" Path="sign-in" Text="Sign in"></RadzenMenuItem>
+    }
+</RadzenMenu>
+
+@Body
+
+<RadzenDialog />
+
+@code {
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        Service.User = await Service.GetUserAsync(LocalStorage);
+        StateHasChanged();
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    protected async Task SignOut()
+    {
+        Service.SetLoading(true);
+        await Task.Delay(500);
+        var user = new UserInfo(string.Empty);
+        await Service.SetUserAsync(LocalStorage, user);
+        Service.User = user;
+        NavigationManager.NavigateTo("");
+        Service.SetLoading(false);
+    }
+}

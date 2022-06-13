@@ -1,0 +1,44 @@
+@page "/sign-in"
+
+@using Microsoft.EntityFrameworkCore
+
+@inherits AbstractComponentBase
+
+@if (Service.IsLoading)
+{
+    <Loading></Loading>
+}
+<div class="@AppClass.FadeIn align-items-center d-flex h-100 justify-content-center w-100">
+    <RadzenCard>
+        <h2 class="mb-4">Simple login</h2>
+        <RadzenTemplateForm Data=@("SimpleLogin")>
+            <RadzenLogin AllowRegister="false" AllowResetPassword="false" Login=@Login />
+        </RadzenTemplateForm>
+    </RadzenCard>
+</div>
+
+@code {
+
+    protected async Task Login(LoginArgs args)
+    {
+        try
+        {
+            Service.SetLoading(true);
+            using var context = await DbFactory.CreateDbContextAsync();
+            var user = await context.Users.FirstOrDefaultAsync(x => x.Username == args.Username && x.Password == args.Password.ToSHA512());
+            if (user is null)
+            {
+                await Js.InvokeVoidAsync("alert", "Your account or password is incorrect");
+                return;
+            }
+            await Service.SetUserAsync(LocalStorage, user);
+            User = user;
+            Service.SetLoading(false);
+            Navigation.NavigateTo("");
+        }
+        catch (Exception ex)
+        {
+            await ErrorAsync(ex);
+        }
+    }
+}

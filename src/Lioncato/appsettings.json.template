@@ -1,0 +1,12 @@
+{
+  "AllowedHosts": "*",
+  "ConnectionStrings": {
+    "AppContextSqlServer": "Persist Security Info=False;User ID=*****;Password=*****;Initial Catalog=AdventureWorks;Server=MySqlServer"
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  }
+}

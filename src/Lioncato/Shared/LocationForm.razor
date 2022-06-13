@@ -1,0 +1,29 @@
+@using Data
+
+<RadzenLabel Class="mb-1" Text="Name" />
+<RadzenTextBox @bind-Value="Location.Name" Class="mb-2 w-100" />
+
+<RadzenLabel Class="mb-1" Text="Apple Maps" />
+<RadzenTextBox @bind-Value="Location.AppleMapsUrl" Class="mb-2 w-100" />
+
+<RadzenLabel Class="mb-1" Text="Google Maps" />
+<RadzenTextBox @bind-Value="Location.GoogleMapsUrl" Class="mb-2 w-100" />
+
+<RadzenCheckBox @bind-Value="Location.IsPublic" Class="mb-2 mt-2" Name="Public" TValue="bool" />
+<RadzenLabel Class="align-middle mb-2 ml-2 mt-2" Text="Public" Component="Public" />
+
+<RadzenButton Class="mt-2 w-100" Click="OnSave" Text="Save"></RadzenButton>
+
+@code {
+
+    [Parameter]
+    public LocationInfo Location { get; set; } = new LocationInfo();
+
+    [Parameter]
+    public EventCallback<LocationInfo> Save { get; set; }
+
+    protected async Task OnSave()
+    {
+        await Save.InvokeAsync(Location);
+    }
+}
