@@ -5,25 +5,33 @@
 
 @inherits AbstractComponentBase
 
-@inject DialogService Dialog
-
 <PageTitle>Lioncato</PageTitle>
 
 <div class="@AppClass.FadeIn container">
     <RadzenCard>
         <h2>Lioncato</h2>
-        <LocationForm Location="Location" Save="SaveAsync"></LocationForm>
+        <RadzenButton Class="mb-2" ButtonStyle="ButtonStyle.Secondary" Click="@AddAsync" Text="Add" />
         <RadzenDataGrid TItem="LocationInfo" AllowColumnResize="true" AllowPaging="true" AllowSorting="true" Class="rz-selectable" Data="@Locations" PageSize="10" PagerHorizontalAlign="HorizontalAlign.Center" ShowPagingSummary="true">
             <Columns>
-                <RadzenDataGridColumn TItem="LocationInfo" Property="Name" Title="Name" />
-                <RadzenDataGridColumn TItem="LocationInfo" Sortable="false" TextAlign="TextAlign.Center" Width="60px">
+                <RadzenDataGridColumn TItem="LocationInfo" Property="Name" Title="Name">
                     <Template Context="data">
-                        <RadzenImage Path="https://image.twodo.app/icons/apple-maps.png" style="width: 40px; height: 40px; border-radius: 8px;" />
+                        <a Class="pointer" @onclick="() => EditAsync(data)" Style="line-height: 40px;">@data.Name</a>
                     </Template>
                 </RadzenDataGridColumn>
                 <RadzenDataGridColumn TItem="LocationInfo" Sortable="false" TextAlign="TextAlign.Center" Width="60px">
                     <Template Context="data">
-                        <RadzenImage Path="https://image.twodo.app/icons/google-maps.png" style="width: 40px; height: 40px; border-radius: 8px;" />
+                        @if (!string.IsNullOrEmpty(data.AppleMapsUrl))
+                        {
+                            <RadzenImage Path="https://image.twodo.app/icons/apple-maps.png" style="width: 40px; height: 40px; border-radius: 8px;" />
+                        }
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="LocationInfo" Sortable="false" TextAlign="TextAlign.Center" Width="60px">
+                    <Template Context="data">
+                        @if (!string.IsNullOrEmpty(data.GoogleMapsUrl))
+                        {
+                            <RadzenImage Path="https://image.twodo.app/icons/google-maps.png" style="width: 40px; height: 40px; border-radius: 8px;" />
+                        }
                     </Template>
                 </RadzenDataGridColumn>
             </Columns>
@@ -34,12 +42,39 @@
 @code {
 
     protected List<LocationInfo> AllLocations = new List<LocationInfo>();
-    protected LocationInfo Location = new LocationInfo(string.Empty);
+    protected LocationInfo Location = new LocationInfo();
     protected List<LocationInfo> Locations = new List<LocationInfo>();
 
     protected override async Task OnInitializedAsync()
     {
         await InitLocationsAsync();
+    }
+
+    protected async Task AddAsync()
+    {
+        Location = new LocationInfo(string.Empty);
+        await OpenLocation();
+    }
+
+    protected async Task DeleteAsync(LocationInfo value)
+    {
+        Service.SetLoading(true);
+        using var context = await DbFactory.CreateDbContextAsync();
+        var locations = context.Locations.Where(x => x.Id == value.Id);
+        foreach (var l in locations)
+        {
+            context.Locations.Remove(l);
+        }
+        await context.SaveChangesAsync();
+        AllLocations = AllLocations.Where(x => x.Id != value.Id).ToList();
+        SimpleSearch();
+        Service.SetLoading(false);
+    }
+
+    protected async Task EditAsync(LocationInfo value)
+    {
+        Location = value with { };
+        await OpenLocation();
     }
 
     protected async Task InitLocationsAsync()
@@ -53,6 +88,31 @@
         }
         AllLocations = Locations;
         Service.SetLoading(false);
+    }
+
+    public async Task OpenLocation()
+    {
+        ActionInfo<LocationInfo> rs = await Dialog.OpenAsync<LocationForm>("Info",
+        new Dictionary<string, object>
+        {
+            { "Location", Location },
+        },
+        new DialogOptions
+        {
+            Draggable = true,
+            Resizable = true,
+        });
+        if (rs is not null)
+        {
+            if (rs.Type == ActionType.Save)
+            {
+                await SaveAsync(rs.Result);
+            }
+            else if (rs.Type == ActionType.Delete)
+            {
+                await DeleteAsync(rs.Result);
+            }
+        }
     }
 
     protected async Task SaveAsync(LocationInfo value)

@@ -10,7 +10,7 @@
 }
 <div class="@AppClass.FadeIn align-items-center d-flex h-100 justify-content-center w-100">
     <RadzenCard>
-        <h2 class="mb-4">Simple login</h2>
+        <h2 class="mb-4">Lioncato</h2>
         <RadzenTemplateForm Data=@("SimpleLogin")>
             <RadzenLogin AllowRegister="false" AllowResetPassword="false" Login=@Login />
         </RadzenTemplateForm>
@@ -29,6 +29,7 @@
             if (user is null)
             {
                 await Js.InvokeVoidAsync("alert", "Your account or password is incorrect");
+                Service.SetLoading(false);
                 return;
             }
             await Service.SetUserAsync(LocalStorage, user);

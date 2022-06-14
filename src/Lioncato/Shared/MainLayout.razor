@@ -28,7 +28,6 @@
     </li>
     @if (Service.IsSignedIn)
     {
-        <RadzenMenuItem class="animate__animated animate__fadeIn" Icon="home" Path="fetchData" Text="FetchData"></RadzenMenuItem>
         <RadzenMenuItem class="animate__animated animate__fadeIn" Icon="home" Path="user" Text="User"></RadzenMenuItem>
         <RadzenMenuItem class="animate__animated animate__fadeIn user-menu-item" Icon="person" Text="@Service.User.Username">
             <RadzenMenuItem Click="@SignOut" Icon="logout" Text="Sign out"></RadzenMenuItem>
@@ -60,7 +59,8 @@
         var user = new UserInfo(string.Empty);
         await Service.SetUserAsync(LocalStorage, user);
         Service.User = user;
-        NavigationManager.NavigateTo("");
         Service.SetLoading(false);
+        NavigationManager.NavigateTo("sign-in");
+        NavigationManager.NavigateTo("");
     }
 }

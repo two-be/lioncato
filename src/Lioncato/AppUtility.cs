@@ -40,3 +40,10 @@ public static class AppExtensions
         return BitConverter.ToString(hash).Replace("-", string.Empty);
     }
 }
+
+public enum ActionType
+{
+    None = 0,
+    Delete = 1,
+    Save = 2,
+}

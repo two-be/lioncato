@@ -1,29 +1,37 @@
 @using Data
+@using Pages
 
-<RadzenLabel Class="mb-1" Text="Name" />
-<RadzenTextBox @bind-Value="Location.Name" Class="mb-2 w-100" />
+@inherits AbstractComponentBase
 
-<RadzenLabel Class="mb-1" Text="Apple Maps" />
-<RadzenTextBox @bind-Value="Location.AppleMapsUrl" Class="mb-2 w-100" />
+<div Class="@AppClass.FadeIn">
+    <RadzenLabel Class="mb-1" Text="Name" />
+    <RadzenTextBox @bind-Value="Location.Name" Class="mb-2 w-100" />
 
-<RadzenLabel Class="mb-1" Text="Google Maps" />
-<RadzenTextBox @bind-Value="Location.GoogleMapsUrl" Class="mb-2 w-100" />
+    <RadzenLabel Class="mb-1" Text="Apple Maps" />
+    <RadzenTextBox @bind-Value="Location.AppleMapsUrl" Class="mb-2 w-100" />
 
-<RadzenCheckBox @bind-Value="Location.IsPublic" Class="mb-2 mt-2" Name="Public" TValue="bool" />
-<RadzenLabel Class="align-middle mb-2 ml-2 mt-2" Text="Public" Component="Public" />
+    <RadzenLabel Class="mb-1" Text="Google Maps" />
+    <RadzenTextBox @bind-Value="Location.GoogleMapsUrl" Class="mb-2 w-100" />
 
-<RadzenButton Class="mt-2 w-100" Click="OnSave" Text="Save"></RadzenButton>
+    <RadzenCheckBox @bind-Value="Location.IsPublic" Class="mb-2 mt-2" Name="Public" TValue="bool" />
+    <RadzenLabel Class="align-middle mb-2 ml-2 mt-2" Text="Public" Component="Public" />
+
+    <RadzenButton Class="mt-2 w-100" Click="OnSave" Text="Save"></RadzenButton>
+    <RadzenButton Class="mt-2 w-100" Click="OnDelete" Text="Delete" ButtonStyle="ButtonStyle.Danger" />
+</div>
 
 @code {
 
     [Parameter]
     public LocationInfo Location { get; set; } = new LocationInfo();
 
-    [Parameter]
-    public EventCallback<LocationInfo> Save { get; set; }
-
-    protected async Task OnSave()
+    protected void OnDelete()
     {
-        await Save.InvokeAsync(Location);
+        Dialog.Close(new ActionInfo<LocationInfo>(ActionType.Delete, Location));
+    }
+
+    protected void OnSave()
+    {
+        Dialog.Close(new ActionInfo<LocationInfo>(ActionType.Save, Location));
     }
 }

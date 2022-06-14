@@ -1,6 +1,6 @@
 namespace Lioncato.Data;
 
-public class LocationInfo
+public record LocationInfo
 {
     public string Id { get; set; } = Guid.NewGuid().ToString("N");
     public string AppleMapsUrl { get; set; } = string.Empty;

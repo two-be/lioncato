@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.JSInterop;
-// using Radzen;
+using Radzen;
 
 namespace Lioncato.Pages;
 
@@ -13,8 +13,8 @@ public class AbstractComponentBase : ComponentBase
 {
     [Inject]
     protected IDbContextFactory<AppDbContext> DbFactory { get; set; }
-    // [Inject]
-    // protected DialogService Dialog { get; set; }
+    [Inject]
+    protected DialogService Dialog { get; set; }
     [Inject]
     protected ProtectedLocalStorage LocalStorage { get; set; }
     [Inject]
