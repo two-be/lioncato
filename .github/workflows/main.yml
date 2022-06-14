@@ -1,0 +1,48 @@
+name: main
+
+on:
+  push:
+    tags:
+      - "*"
+
+env:
+  IMAGE_NAME: ${{ github.repository }}
+  REGISTRY: ghcr.io
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 6.0.x
+    - name: .NET - Restore dependencies
+      run: dotnet restore src/Lioncato/Lioncato.csproj
+    - name: .NET - Build
+      run: dotnet build --no-restore src/Lioncato/Lioncato.csproj
+    - name: .NET - Publish
+      run: dotnet publish src/Lioncato/Lioncato.csproj -c Release -o published -p:PublishTrimmed=true -r linux-x64
+
+    - name: Log into registry ${{ env.REGISTRY }}
+      uses: docker/login-action@28218f9b04b4f3f62068d7b6ce6ca5b26e35336c
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    - name: Extract Docker metadata
+      id: meta
+      uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+    - name: Build and push Docker image
+      uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+      with:
+        context: .
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}

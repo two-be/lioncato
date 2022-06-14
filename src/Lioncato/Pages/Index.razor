@@ -10,7 +10,18 @@
 <div class="@AppClass.FadeIn container">
     <RadzenCard>
         <h2>Lioncato</h2>
-        <RadzenButton Class="mb-2" ButtonStyle="ButtonStyle.Secondary" Click="@AddAsync" Text="Add" />
+        <div Class="mb-2 row">
+            <div Class="col-6 p-0">
+                @if (IsSignedIn)
+                {
+                    <RadzenButton Click="@AddAsync" Text="Add" />
+                }
+            </div>
+            <div Class="col-6 p-0">
+                <RadzenTextBox @bind-Value="Keyword" Class="w-100" @oninput="(args) => SimpleSearch(args.Value)" Placeholder="Search..." />
+            </div>
+        </div>
+        <hr>
         <RadzenDataGrid TItem="LocationInfo" AllowColumnResize="true" AllowPaging="true" AllowSorting="true" Class="rz-selectable" Data="@Locations" PageSize="10" PagerHorizontalAlign="HorizontalAlign.Center" ShowPagingSummary="true">
             <Columns>
                 <RadzenDataGridColumn TItem="LocationInfo" Property="Name" Title="Name">
@@ -22,7 +33,9 @@
                     <Template Context="data">
                         @if (!string.IsNullOrEmpty(data.AppleMapsUrl))
                         {
-                            <RadzenImage Path="https://image.twodo.app/icons/apple-maps.png" style="width: 40px; height: 40px; border-radius: 8px;" />
+                            <a Href="@data.AppleMapsUrl" Target="_blank">
+                                <RadzenImage Path="https://image.twodo.app/icons/apple-maps.png" Style="width: 40px; height: 40px; border-radius: 8px;" />
+                            </a>
                         }
                     </Template>
                 </RadzenDataGridColumn>
@@ -30,7 +43,9 @@
                     <Template Context="data">
                         @if (!string.IsNullOrEmpty(data.GoogleMapsUrl))
                         {
-                            <RadzenImage Path="https://image.twodo.app/icons/google-maps.png" style="width: 40px; height: 40px; border-radius: 8px;" />
+                            <a Href="@data.GoogleMapsUrl" Target="_blank">
+                                <RadzenImage Path="https://image.twodo.app/icons/google-maps.png" Style="width: 40px; height: 40px; border-radius: 8px;" />
+                            </a>
                         }
                     </Template>
                 </RadzenDataGridColumn>
@@ -58,7 +73,7 @@
 
     protected async Task DeleteAsync(LocationInfo value)
     {
-        Service.SetLoading(true);
+        SetLoading(true);
         using var context = await DbFactory.CreateDbContextAsync();
         var locations = context.Locations.Where(x => x.Id == value.Id);
         foreach (var l in locations)
@@ -67,27 +82,31 @@
         }
         await context.SaveChangesAsync();
         AllLocations = AllLocations.Where(x => x.Id != value.Id).ToList();
-        SimpleSearch();
-        Service.SetLoading(false);
+        SimpleSearch(Keyword);
+        SetLoading(false);
     }
 
     protected async Task EditAsync(LocationInfo value)
     {
+        if (!IsSignedIn)
+        {
+            return;
+        }
         Location = value with { };
         await OpenLocation();
     }
 
     protected async Task InitLocationsAsync()
     {
-        Service.SetLoading(true);
+        SetLoading(true);
         using var context = await DbFactory.CreateDbContextAsync();
         Locations = await context.Locations.ToListAsync();
-        if (!Service.IsSignedIn)
+        if (!IsSignedIn)
         {
             Locations = Locations.Where(x => x.IsPublic).ToList();
         }
         AllLocations = Locations;
-        Service.SetLoading(false);
+        SetLoading(false);
     }
 
     public async Task OpenLocation()
@@ -95,7 +114,7 @@
         ActionInfo<LocationInfo> rs = await Dialog.OpenAsync<LocationForm>("Info",
         new Dictionary<string, object>
         {
-            { "Location", Location },
+{ "Location", Location },
         },
         new DialogOptions
         {
@@ -119,7 +138,7 @@
     {
         try
         {
-            Service.SetLoading(true);
+            SetLoading(true);
             using var context = await DbFactory.CreateDbContextAsync();
             var id = value.Id;
             var location = new LocationInfo();
@@ -133,7 +152,7 @@
                 if (location is null)
                 {
                     await AlertAsync("That location doesn't exist.");
-                    Service.SetLoading(false);
+                    SetLoading(false);
                     return;
                 }
             }
@@ -146,8 +165,8 @@
             AllLocations = AllLocations.Where(x => x.Id != id).ToList();
             AllLocations.Insert(0, location);
             Location = new LocationInfo(string.Empty);
-            SimpleSearch();
-            Service.SetLoading(false);
+            SimpleSearch(Keyword);
+            SetLoading(false);
         }
         catch (Exception ex)
         {
@@ -155,8 +174,9 @@
         }
     }
 
-    protected void SimpleSearch()
+    protected void SimpleSearch(object? value)
     {
-        Locations = AllLocations.Where(x => true).ToList();
+        var keyword = $"{value}".ToUpper();
+        Locations = AllLocations.Where(x => $"{x.Name}".ToUpper().Contains(keyword)).ToList();
     }
 }

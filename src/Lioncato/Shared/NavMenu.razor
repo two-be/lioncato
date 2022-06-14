@@ -1,0 +1,45 @@
+@using Data
+@using Pages
+
+@inherits AbstractComponentBase
+
+@if (IsLoading)
+{
+    <Loading></Loading>
+}
+
+<RadzenMenu class="@AppClass.FadeIn">
+    <li class="logo">
+        <div class="rz-navigation-item-wrapper">
+            <a href="/" class="rz-navigation-item-link">
+                <img class="rzi rz-navigation-item-icon" src="https://image.twodo.app/icons/1946770.png">
+                <span class="rz-navigation-item-text">Lioncato</span>
+            </a>
+        </div>
+    </li>
+    @if (!string.IsNullOrEmpty(User.Id))
+    {
+        <RadzenMenuItem class="animate__animated animate__fadeIn user-menu-item" Icon="person" Text="@User.Username">
+            <RadzenMenuItem Click="@SignOut" Icon="logout" Text="Sign out"></RadzenMenuItem>
+        </RadzenMenuItem>
+    }
+    else
+    {
+        <RadzenMenuItem class="animate__animated animate__fadeIn user-menu-item" Icon="login" Path="sign-in" Text="Sign in"></RadzenMenuItem>
+    }
+</RadzenMenu>
+
+@code {
+
+    protected async Task SignOut()
+    {
+        SetLoading(true);
+        await Task.Delay(500);
+        var user = new UserInfo(string.Empty);
+        await Service.SetUserAsync(LocalStorage, user);
+        User = user;
+        SetLoading(false);
+        Navigation.NavigateTo("sign-in");
+        Navigation.NavigateTo("");
+    }
+}

@@ -48,6 +48,12 @@ a {
     padding-top: 70px;
 }
 
+hr {
+    background-color: #45565d;
+    border: none;
+    height: 1px;
+}
+
 .loading-overlay {
     align-items: center;
     background: rgba(0, 0, 0, 0.5);
@@ -63,6 +69,11 @@ a {
 
 .pointer {
     cursor: pointer;
+}
+
+.row {
+    margin-left: 0;
+    margin-right: 0;
 }
 
 .rz-menu {

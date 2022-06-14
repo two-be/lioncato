@@ -4,7 +4,7 @@
 
 @inherits AbstractComponentBase
 
-@if (Service.IsLoading)
+@if (IsLoading)
 {
     <Loading></Loading>
 }
@@ -23,18 +23,18 @@
     {
         try
         {
-            Service.SetLoading(true);
+            SetLoading(true);
             using var context = await DbFactory.CreateDbContextAsync();
             var user = await context.Users.FirstOrDefaultAsync(x => x.Username == args.Username && x.Password == args.Password.ToSHA512());
             if (user is null)
             {
                 await Js.InvokeVoidAsync("alert", "Your account or password is incorrect");
-                Service.SetLoading(false);
+                SetLoading(false);
                 return;
             }
             await Service.SetUserAsync(LocalStorage, user);
             User = user;
-            Service.SetLoading(false);
+            SetLoading(false);
             Navigation.NavigateTo("");
         }
         catch (Exception ex)

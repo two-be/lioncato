@@ -16,8 +16,14 @@
     <RadzenCheckBox @bind-Value="Location.IsPublic" Class="mb-2 mt-2" Name="Public" TValue="bool" />
     <RadzenLabel Class="align-middle mb-2 ml-2 mt-2" Text="Public" Component="Public" />
 
-    <RadzenButton Class="mt-2 w-100" Click="OnSave" Text="Save"></RadzenButton>
-    <RadzenButton Class="mt-2 w-100" Click="OnDelete" Text="Delete" ButtonStyle="ButtonStyle.Danger" />
+    <div Class="mt-2 row">
+        <div Class="col-11 p-0 pr-1">
+            <RadzenButton Class="w-100" Click="OnSave" Text="Save"></RadzenButton>
+        </div>
+        <div Class="col-1 p-0 pl-1">
+            <RadzenButton ButtonStyle="ButtonStyle.Danger" Class="w-100" Click="OnDelete" Disabled="string.IsNullOrEmpty(Location.Id)" Icon="delete" />
+        </div>
+    </div>
 </div>
 
 @code {
@@ -25,13 +31,22 @@
     [Parameter]
     public LocationInfo Location { get; set; } = new LocationInfo();
 
-    protected void OnDelete()
+    protected async Task OnDelete()
     {
-        Dialog.Close(new ActionInfo<LocationInfo>(ActionType.Delete, Location));
+        if (await ConfirmAsync())
+        {
+            Dialog.Close(new ActionInfo<LocationInfo>(ActionType.Delete, Location));
+        }
     }
 
-    protected void OnSave()
+    protected async Task OnSave()
     {
+        var validate = Location.Validate();
+        if (!string.IsNullOrEmpty(validate))
+        {
+            await AlertAsync(validate);
+            return;
+        }
         Dialog.Close(new ActionInfo<LocationInfo>(ActionType.Save, Location));
     }
 }

@@ -24,6 +24,9 @@ public class AbstractComponentBase : ComponentBase
     [Inject]
     protected AppService Service { get; set; }
 
+    protected bool IsLoading = false;
+    protected bool IsSignedIn => !string.IsNullOrEmpty(User.Id);
+    protected string Keyword = string.Empty;
     protected UserInfo User = new UserInfo(string.Empty);
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -38,6 +41,11 @@ public class AbstractComponentBase : ComponentBase
         await Js.InvokeVoidAsync("alert", message);
     }
 
+    protected async Task<bool> ConfirmAsync()
+    {
+        return await Js.InvokeAsync<bool>("confirm", "Are you sure?");
+    }
+
     protected async Task ErrorAsync(Exception ex)
     {
         if (ex.InnerException is not null)
@@ -48,6 +56,11 @@ public class AbstractComponentBase : ComponentBase
         {
             await AlertAsync(ex.Message);
         }
-        Service.SetLoading(false);
+        SetLoading(false);
+    }
+
+    protected void SetLoading(bool value)
+    {
+        IsLoading = value;
     }
 }
