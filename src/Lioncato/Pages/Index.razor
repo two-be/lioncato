@@ -26,7 +26,7 @@
             <Columns>
                 <RadzenDataGridColumn TItem="LocationInfo" Property="Name" Title="Name">
                     <Template Context="data">
-                        <a Class="@AppClass.FadeIn pointer" @onclick="() => EditAsync(data)" Style="line-height: 40px;">@data.Name</a>
+                        <a Class="@AppClass.FadeIn @(IsSignedIn ? "pointer" : "")" @onclick="() => EditAsync(data)" Style="line-height: 40px;">@data.Name</a>
                     </Template>
                 </RadzenDataGridColumn>
                 <RadzenDataGridColumn TItem="LocationInfo" Sortable="false" TextAlign="TextAlign.Center" Width="60px">
@@ -100,7 +100,7 @@
     {
         SetLoading(true);
         using var context = await DbFactory.CreateDbContextAsync();
-        Locations = await context.Locations.ToListAsync();
+        Locations = await context.Locations.OrderBy(x => x.Name).ToListAsync();
         if (!IsSignedIn)
         {
             Locations = Locations.Where(x => x.IsPublic).ToList();
@@ -114,7 +114,7 @@
         ActionInfo<LocationInfo> rs = await Dialog.OpenAsync<LocationForm>("Info",
         new Dictionary<string, object>
         {
-{ "Location", Location },
+            { "Location", Location },
         },
         new DialogOptions
         {
