@@ -15,15 +15,13 @@
             <img Class="mb-2" Src="https://image.twodo.app/icons/1946770.png" Style="width: 100px;">
             <h2 Class="mb-0">Lioncato</h2>
         </div>
-        <RadzenTemplateForm Data="@User">
-            <RadzenLabel Class="mb-1" Text="Username" />
-            <RadzenTextBox @bind-Value="Info.Username" Class="mb-2 w-100" />
+        <RadzenLabel Class="mb-1" Text="Username" />
+        <RadzenTextBox @bind-Value="Info.Username" Class="mb-2 w-100" />
 
-            <RadzenLabel Class="mb-1" Text="Password" />
-            <RadzenPassword @bind-Value="Info.Password" Class="mb-2 w-100" />
+        <RadzenLabel Class="mb-1" Text="Password" />
+        <RadzenPassword @bind-Value="Info.Password" Class="mb-2 w-100" />
 
-            <RadzenButton ButtonType="ButtonType.Submit" Class="mt-2 w-100" Click="Login" Text="Sign in"></RadzenButton>
-        </RadzenTemplateForm>
+        <RadzenButton Class="mt-2 w-100" Click="Login" Text="Sign in"></RadzenButton>
     </RadzenCard>
 </div>
 
