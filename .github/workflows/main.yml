@@ -26,7 +26,7 @@ jobs:
     - name: .NET - Build
       run: dotnet build --no-restore src/Lioncato/Lioncato.csproj
     - name: .NET - Publish
-      run: dotnet publish src/Lioncato/Lioncato.csproj -c Release -o published -p:PublishTrimmed=true -r linux-x64
+      run: dotnet publish src/Lioncato/Lioncato.csproj -c Release -o published
 
     - name: Log into registry ${{ env.REGISTRY }}
       uses: docker/login-action@28218f9b04b4f3f62068d7b6ce6ca5b26e35336c
