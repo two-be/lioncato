@@ -1,6 +1,6 @@
 namespace Lioncato.Data;
 
-public class UserInfo
+public record UserInfo
 {
     public string Id { get; set; } = Guid.NewGuid().ToString("N");
     public string Password { get; set; } = string.Empty;

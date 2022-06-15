@@ -1,5 +1,6 @@
 @page "/sign-in"
 
+@using Data
 @using Microsoft.EntityFrameworkCore
 
 @inherits AbstractComponentBase
@@ -9,23 +10,34 @@
     <Loading></Loading>
 }
 <div class="@AppClass.FadeIn align-items-center d-flex h-100 justify-content-center w-100">
-    <RadzenCard>
-        <h2 class="mb-4">Lioncato</h2>
-        <RadzenTemplateForm Data=@("SimpleLogin")>
-            <RadzenLogin AllowRegister="false" AllowResetPassword="false" Login=@Login />
+    <RadzenCard Style="max-width: 400px;">
+        <div Class="text-center">
+            <img Class="mb-2" Src="https://image.twodo.app/icons/1946770.png" Style="width: 100px;">
+            <h2 Class="mb-0">Lioncato</h2>
+        </div>
+        <RadzenTemplateForm Data="@User">
+            <RadzenLabel Class="mb-1" Text="Username" />
+            <RadzenTextBox @bind-Value="Info.Username" Class="mb-2 w-100" />
+
+            <RadzenLabel Class="mb-1" Text="Password" />
+            <RadzenPassword @bind-Value="Info.Password" Class="mb-2 w-100" />
+
+            <RadzenButton ButtonType="ButtonType.Submit" Class="mt-2 w-100" Click="Login" Text="Sign in"></RadzenButton>
         </RadzenTemplateForm>
     </RadzenCard>
 </div>
 
 @code {
 
-    protected async Task Login(LoginArgs args)
+    public UserInfo Info = new UserInfo();
+
+    protected async Task Login()
     {
         try
         {
             SetLoading(true);
             using var context = await DbFactory.CreateDbContextAsync();
-            var user = await context.Users.FirstOrDefaultAsync(x => x.Username == args.Username && x.Password == args.Password.ToSHA512());
+            var user = await context.Users.FirstOrDefaultAsync(x => x.Username == Info.Username && x.Password == Info.Password.ToSHA512());
             if (user is null)
             {
                 await Js.InvokeVoidAsync("alert", "Your account or password is incorrect");
