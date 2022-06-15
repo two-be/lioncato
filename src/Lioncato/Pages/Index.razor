@@ -12,7 +12,8 @@
         <h2>Lioncato</h2>
         <div Class="mb-2 row">
             <div Class="col-6 p-0">
-                <RadzenButton @onclick="AddAsync" Text="Add" />
+                @* <RadzenButton Click="@AddAsync" Text="Add" /> *@
+                <button @onclick=AddAsync>Add</button>
             </div>
             <div Class="col-6 p-0">
                 <RadzenTextBox @bind-Value="Keyword" Class="w-100" @oninput="(args) => SimpleSearch(args.Value)" Placeholder="Search..." />
