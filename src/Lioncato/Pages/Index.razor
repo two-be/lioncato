@@ -26,14 +26,14 @@
             <Columns>
                 <RadzenDataGridColumn TItem="LocationInfo" Property="Name" Title="Name">
                     <Template Context="data">
-                        <a Class="pointer" @onclick="() => EditAsync(data)" Style="line-height: 40px;">@data.Name</a>
+                        <a Class="@AppClass.FadeIn pointer" @onclick="() => EditAsync(data)" Style="line-height: 40px;">@data.Name</a>
                     </Template>
                 </RadzenDataGridColumn>
                 <RadzenDataGridColumn TItem="LocationInfo" Sortable="false" TextAlign="TextAlign.Center" Width="60px">
                     <Template Context="data">
                         @if (!string.IsNullOrEmpty(data.AppleMapsUrl))
                         {
-                            <a Href="@data.AppleMapsUrl" Target="_blank">
+                            <a Class="@AppClass.FadeIn" Href="@data.AppleMapsUrl" Target="_blank">
                                 <RadzenImage Path="https://image.twodo.app/icons/apple-maps.png" Style="width: 40px; height: 40px; border-radius: 8px;" />
                             </a>
                         }
@@ -43,7 +43,7 @@
                     <Template Context="data">
                         @if (!string.IsNullOrEmpty(data.GoogleMapsUrl))
                         {
-                            <a Href="@data.GoogleMapsUrl" Target="_blank">
+                            <a Class="@AppClass.FadeIn" Href="@data.GoogleMapsUrl" Target="_blank">
                                 <RadzenImage Path="https://image.twodo.app/icons/google-maps.png" Style="width: 40px; height: 40px; border-radius: 8px;" />
                             </a>
                         }

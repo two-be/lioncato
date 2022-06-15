@@ -11,11 +11,10 @@ public static class AppUtility
 
         using var context = new AppDbContext(builder.Options);
 
-        if (await context.Database.EnsureCreatedAsync())
-        {
-            var seed = new Seed();
-            await seed.SeedDatabaseAsync(context);
-        }
+        await context.Database.MigrateAsync();
+
+        var seed = new Seed();
+        await seed.SeedDatabaseAsync(context);
     }
 }
 
