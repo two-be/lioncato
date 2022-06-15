@@ -1,4 +1,6 @@
 appsettings.Development.json
 appsettings.json
+cake/tools
 bin
 obj
+published
