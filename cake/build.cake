@@ -10,7 +10,7 @@ Task("Publish")
     {
         var settings = new DeploySettings()
         {
-            Password = password,
+            Password = password.Replace("'", string.Empty),
             PublishUrl = "https://location.demosoft.me:8172/msdeploy.axd",
             SiteName = "Lioncato",
             SourcePath = @"../published",
