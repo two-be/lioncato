@@ -1,5 +1,3 @@
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
 using Lioncato.Data;
 using Microsoft.EntityFrameworkCore;
 using Radzen;
