@@ -7,6 +7,10 @@
 
 <PageTitle>Lioncato</PageTitle>
 
+@if (IsLoading)
+{
+    <Loading></Loading>
+}
 <div class="@AppClass.FadeIn container">
     <RadzenCard>
         <h2>Lioncato</h2>
@@ -60,9 +64,13 @@
     protected LocationInfo Location = new LocationInfo();
     protected List<LocationInfo> Locations = new List<LocationInfo>();
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await InitLocationsAsync();
+        await base.OnAfterRenderAsync(firstRender);
+        if (firstRender)
+        {
+            await InitLocationsAsync();
+        }
     }
 
     protected async Task AddAsync()

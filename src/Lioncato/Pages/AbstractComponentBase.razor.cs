@@ -31,8 +31,11 @@ public class AbstractComponentBase : ComponentBase
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        User = await Service.GetUserAsync(LocalStorage);
-        StateHasChanged();
+        if (string.IsNullOrEmpty(User.Id))
+        {
+            User = await Service.GetUserAsync(LocalStorage);
+            StateHasChanged();
+        }
         await base.OnAfterRenderAsync(firstRender);
     }
 
@@ -62,5 +65,6 @@ public class AbstractComponentBase : ComponentBase
     protected void SetLoading(bool value)
     {
         IsLoading = value;
+        StateHasChanged();
     }
 }
