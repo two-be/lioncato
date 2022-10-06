@@ -1,5 +1,7 @@
 #nullable disable
 
+using Microsoft.EntityFrameworkCore;
+
 namespace Lioncato.Data;
 
 public class Seed

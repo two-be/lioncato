@@ -4,7 +4,7 @@ using Radzen;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddDbContextFactory<AppDbContext>(opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("AppContextSqlServer")));
+builder.Services.AddDbContextFactory<AppDbContext>(opt => opt.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddRazorPages();
 builder.Services.AddScoped<DialogService>();
 builder.Services.AddServerSideBlazor();
